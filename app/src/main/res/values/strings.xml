@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">R - Harn</string>
+    <string name="main_description">จัดการมื้ออาหารและการเงินของคุณได้ที่นี่</string>
+    <string name="main_shareFood">เริ่มหารค่ามื้ออาหาร</string>
+    <string name="main_buffetCal">มาเริ่มคำนวณค่าอาหารกัน</string>
+
+    <string name="bc_title">มาคำนวนค่าบุฟเฟ่ต์กันเถอะ !</string>
+    <string name="bc_pricePerUnit">ค่าอาหารต่อคน</string>
+    <string name="bc_drinkerPricePerUnit">ค่าน้ำต่อคน</string>
+    <string name="bc_tax">ภาษีมูลค่าเพิ่ม (7%)</string>
+    <string name="bc_serviceCharge">ค่าบริการ (%)</string>
+    <string name="bc_tips">ทิป (%)</string>
+    <string name="bc_headCount">จำนวนคน</string>
+    <string name="bc_salePrice">ส่วนลด (ราคา)</string>
+    <string name="bc_salePercent">ส่วนลด (%)</string>
+    <string name="bc_calculator">เริ่มคำนวนกันเลย !</string>
+        <string name="bcHint_drinkerPrice">39</string>
+        <string name="bcHint_pricePerUnit">250</string>
+        <string name="bcHint_serviceCharge">10</string>
+        <string name="bcHint_tips">10</string>
+        <string name="bcHint_headCount">1</string>
+        <string name="bc_set0">0</string>
+</resources>

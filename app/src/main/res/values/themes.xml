@@ -1,0 +1,11 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.FinanceManagement" parent="Theme.Material3.Light.NoActionBar">
+
+        <item name="fontFamily">@font/prompt</item>
+        <item name="backgroundColor">@color/light</item>
+        <item name="color">@color/dark</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+    <style name="Theme.FinanceManagement" parent="Base.Theme.FinanceManagement" />
+</resources>
