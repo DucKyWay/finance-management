@@ -53,51 +53,48 @@ public class BuffetCalculatorActivity extends AppCompatActivity {
             String headCountText = HeadCount.getText().toString();
             String saleText = Sale.getText().toString();
 
-            if (priceText.isEmpty() || drinkerText.isEmpty() || serChargeText.isEmpty() || tipsText.isEmpty() || headCountText.isEmpty()) {
+            if (priceText.isEmpty() || headCountText.isEmpty()) {
                 RequiredFieldsErrorPopup();
-            } else {
-                // Convert Variable
-                double price = Double.parseDouble(priceText);
-                double drinker = Double.parseDouble(drinkerText);
-                boolean isTaxChecked = isTax.isChecked();
-                int serviceCharge = Integer.parseInt(serChargeText);
-                int tips = Integer.parseInt(tipsText);
-                int headCount = Integer.parseInt(headCountText);
-                double sale = Double.parseDouble(saleText);
+                return;
+            }
 
-                if (saleText.isEmpty()) {
-                    sale = 0.00;
-                }
+            // Convert Variable
+            double price = Double.parseDouble(priceText);
+            double drinker = drinkerText.isEmpty() ? 0.00 : Double.parseDouble(drinkerText); // if empty = 0
+            boolean isTaxChecked = isTax.isChecked();
+            int serviceCharge = serChargeText.isEmpty() ? 0 : Integer.parseInt(serChargeText); // if empty = 0
+            int tips = tipsText.isEmpty() ? 0 : Integer.parseInt(tipsText); // if empty = 0
+            int headCount = Integer.parseInt(headCountText);
+            double sale = saleText.isEmpty() ? 0.00 : Double.parseDouble(saleText); // if empty = 0
 
-                double Tax = 0.00;
-                if (isTaxChecked) {
-                    Tax = 0.07;
-                }
+            if (saleText.isEmpty()) {
+                sale = 0.00;
+            }
+            double Tax = isTaxChecked ? 0.07 : 0.00;
 
-                if (headCount != 0) {
+            if (headCount != 0) {
 
-                    TotalPricePerUnit = (price + drinker) * (1 + Tax + (serviceCharge * 0.01) + (tips * 0.01));
-                    TotalPrice = TotalPricePerUnit * headCount;
+                TotalPricePerUnit = (price + drinker) * (1 + Tax + (serviceCharge * 0.01) + (tips * 0.01));
+                TotalPrice = TotalPricePerUnit * headCount;
 
-                    SaleRadio = findViewById(R.id.radioSale);
-                    int checkedRadioButtonId = SaleRadio.getCheckedRadioButtonId();
-                    if (checkedRadioButtonId == R.id.radioSalePrice) {
+                SaleRadio = findViewById(R.id.radioSale);
+                int checkedRadioButtonId = SaleRadio.getCheckedRadioButtonId();
+                if (checkedRadioButtonId == R.id.radioSalePrice) {
 
-                        TotalPrice -= sale;
-                        TotalPricePerUnit = TotalPrice / headCount;
-                    } else if (checkedRadioButtonId == R.id.radioSalePercent) {
+                    TotalPrice -= sale;
+                    TotalPricePerUnit = TotalPrice / headCount;
+                } else if (checkedRadioButtonId == R.id.radioSalePercent) {
 
-                        double salePercent = sale * 0.01;
-                        TotalPricePerUnit = TotalPrice / headCount;
-                        TotalPrice *= 1 - salePercent;
-                    } else {
-                        RequiredFieldsErrorPopup();
-                    }
-
-                    showPricePopup(headCount, TotalPricePerUnit, TotalPrice);
+                    double salePercent = sale * 0.01;
+                    TotalPricePerUnit = TotalPrice / headCount;
+                    TotalPrice *= 1 - salePercent;
                 } else {
                     RequiredFieldsErrorPopup();
                 }
+
+                showPricePopup(headCount, TotalPricePerUnit, TotalPrice);
+            } else {
+                RequiredFieldsErrorPopup();
             }
         });
     }
@@ -130,7 +127,7 @@ public class BuffetCalculatorActivity extends AppCompatActivity {
         TextView titleTextView = customLayout.findViewById(R.id.titleText);
         titleTextView.setText("คำเตือน");
         TextView messageTextView = customLayout.findViewById(R.id.messageText);
-        messageTextView.setText("กรุณากรอกข้อมูลให้ครบถ้วน หรือ จำนวนคน > 0");
+        messageTextView.setText("กรุณากรอกข้อมูล ราคาอาหาร หรือ จำนวนคนมากกว่า 0");
 
         builder.setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
         builder.show();
