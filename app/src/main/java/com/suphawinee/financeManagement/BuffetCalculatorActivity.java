@@ -66,25 +66,18 @@ public class BuffetCalculatorActivity extends AppCompatActivity {
             int tips = tipsText.isEmpty() ? 0 : Integer.parseInt(tipsText); // if empty = 0
             int headCount = Integer.parseInt(headCountText);
             double sale = saleText.isEmpty() ? 0.00 : Double.parseDouble(saleText); // if empty = 0
-
-            if (saleText.isEmpty()) {
-                sale = 0.00;
-            }
             double Tax = isTaxChecked ? 0.07 : 0.00;
 
             if (headCount != 0) {
-
                 TotalPricePerUnit = (price + drinker) * (1 + Tax + (serviceCharge * 0.01) + (tips * 0.01));
                 TotalPrice = TotalPricePerUnit * headCount;
 
                 SaleRadio = findViewById(R.id.radioSale);
                 int checkedRadioButtonId = SaleRadio.getCheckedRadioButtonId();
                 if (checkedRadioButtonId == R.id.radioSalePrice) {
-
                     TotalPrice -= sale;
                     TotalPricePerUnit = TotalPrice / headCount;
                 } else if (checkedRadioButtonId == R.id.radioSalePercent) {
-
                     double salePercent = sale * 0.01;
                     TotalPricePerUnit = TotalPrice / headCount;
                     TotalPrice *= 1 - salePercent;
@@ -103,33 +96,43 @@ public class BuffetCalculatorActivity extends AppCompatActivity {
 
     private void showPricePopup(int headcount, double totalPricePerUnit, double totalPrice) {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        if(isFinishing()) return;
 
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         @SuppressLint("InflateParams") View customLayout = getLayoutInflater().inflate(R.layout.custom_popup_layout, null);
-        builder.setCustomTitle(customLayout);
+//        builder.setCustomTitle(customLayout);
+        builder.setView(customLayout);
 
         TextView titleTextView = customLayout.findViewById(R.id.titleText);
         titleTextView.setText("ค่าอาหารมื้อนี้");
         TextView messageTextView = customLayout.findViewById(R.id.messageText);
-        messageTextView.setText("ราคาต่อคน: " + totalPricePerUnit + "\nจำนวนคนในกลุ่ม: " + headcount + "\nราคารวมทั้งหมด: " + totalPrice);
+        messageTextView.setText(
+            "ราคาต่อคน: " + totalPricePerUnit + "\n" +
+            "จำนวนคนในกลุ่ม: " + headcount + "\n" +
+            "ราคารวมทั้งหมด: " + totalPrice
+        );
 
         builder.setPositiveButton("คำนวนใหม่", (dialog, which) -> dialog.dismiss());
+        AlertDialog dialog = builder.create();
         builder.show();
     }
 
     private void RequiredFieldsErrorPopup() {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        if(isFinishing()) return;
 
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         @SuppressLint("InflateParams") View customLayout = getLayoutInflater().inflate(R.layout.custom_popup_layout, null);
-        builder.setCustomTitle(customLayout);
+//        builder.setCustomTitle(customLayout);
+        builder.setView(customLayout);
 
         TextView titleTextView = customLayout.findViewById(R.id.titleText);
         titleTextView.setText("คำเตือน");
         TextView messageTextView = customLayout.findViewById(R.id.messageText);
-        messageTextView.setText("กรุณากรอกข้อมูล ราคาอาหาร หรือ จำนวนคนมากกว่า 0");
+        messageTextView.setText("กรุณากรอกข้อมูล ค่าอาหาร และ จำนวนคน > 0");
 
         builder.setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
+        AlertDialog dialog = builder.create();
         builder.show();
     }
 }
