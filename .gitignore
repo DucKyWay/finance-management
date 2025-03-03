@@ -2,9 +2,9 @@
 .idea/
 
 # Ignore build outputs
-build/generated
-build/intermediates
-build/tmp
+app/build/generated
+app/build/intermediates
+app/build/tmp
 
 # Ignore Gradle wrapper files
 gradle/wrapper/
