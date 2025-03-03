@@ -30,7 +30,7 @@ jobs:
 
       - name: Generate Dynamic Tag
         id: get_latest_tag
-        run: echo "TAG_NAME=v$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
+        run: echo "TAG_NAME=v$(date +'%Y%-m-%d_%H%M%S')" >> $GITHUB_ENV
 
       - name: Upload APK (Main Branch)
         if: github.ref == 'refs/heads/main'
@@ -42,6 +42,9 @@ jobs:
           name: "Release ${{ env.TAG_NAME }}"
           draft: false
           prerelease: false
+          omitBody: true      # no source code
+          omitName: true      # no source code
+          removeArtifacts: true
 
       - name: Upload APK (Develop Branch)
         if: github.ref == 'refs/heads/develop'
