@@ -19,14 +19,20 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
+      - name: Grant execute permission to Gradlew
+        run: chmod +x ./gradlew
+
       - name: Build APK
         run: ./gradlew assembleRelease
+
+      - name: Debug Build Outputs (Check APK Exists)
+        run: ls -R app/build/outputs/apk/
 
       - name: Upload APK (Main Branch)
         if: github.ref == 'refs/heads/main'
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "app/build/outputs/apk/release/app-release.apk"
+          artifacts: "app/build/outputs/apk/release/*.apk"  # Use wildcard to ensure match
           token: ${{ secrets.PAT_TOKEN }}
           tag: v1.0
           name: "Release v1.0"
@@ -38,4 +44,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: APK-Develop
-          path: app/build/outputs/apk/release/app-release.apk
+          path: app/build/outputs/apk/debug/*.apk
