@@ -28,11 +28,9 @@ jobs:
       - name: Debug Build Outputs (Check APK Exists)
         run: ls -R app/build/outputs/apk/
 
-      - name: Delete Existing Tag (if exists)
-        run: |
-          git tag -d v1.0 || true
-          git push origin --delete v1.0 || true
-        continue-on-error: true
+      - name: Generate Dynamic Tag
+        id: get_latest_tag
+        run: echo "TAG_NAME=v$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
 
       - name: Upload APK (Main Branch)
         if: github.ref == 'refs/heads/main'
@@ -40,15 +38,14 @@ jobs:
         with:
           artifacts: "app/build/outputs/apk/release/*.apk"
           token: ${{ secrets.PAT_TOKEN }}
-          tag: v1.0
-          name: "Release v1.0"
+          tag: ${{ env.TAG_NAME }}
+          name: "Release ${{ env.TAG_NAME }}"
           draft: false
           prerelease: false
-          replacesArtifacts: true
 
       - name: Upload APK (Develop Branch)
         if: github.ref == 'refs/heads/develop'
         uses: actions/upload-artifact@v4
         with:
           name: APK-Develop
-          path: app/build/outputs/apk/release/*.apk
+          path: app/build/outputs/apk/release/*.apk"
