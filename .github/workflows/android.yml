@@ -1,0 +1,41 @@
+name: Build APK
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Build APK
+        run: ./gradlew assembleRelease
+
+      - name: Upload APK (Main Branch)
+        if: github.ref == 'refs/heads/main'
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "app/build/outputs/apk/release/app-release.apk"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: v1.0
+          name: "Release v1.0"
+          draft: false
+          prerelease: false
+
+      - name: Upload APK (Develop Branch)
+        if: github.ref == 'refs/heads/develop'
+        uses: actions/upload-artifact@v3
+        with:
+          name: APK-Develop
+          path: app/build/outputs/apk/release/app-release.apk
