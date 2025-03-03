@@ -25,26 +25,12 @@ public class BuffetCalculatorActivity extends AppCompatActivity {
     private RadioGroup SaleRadio;
     private EditText Sale;
 
-    private Double TotalPrice;
-    private Double TotalPricePerUnit;
+    private double TotalPrice = 0.0;
+    private double TotalPricePerUnit = 0.0;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.buffet_calculator);
-
-        // Input Variable
-        PricePerUnit = findViewById(R.id.inputBcPricePerUnit);
-        DrinkPricePerUnit = findViewById(R.id.inputBcDrinkerPrice);
-        isTax = findViewById(R.id.switchBcTax);
-        SerCharge = findViewById(R.id.inputBcServiceCharge);
-        Tips = findViewById(R.id.inputBcTips);
-        HeadCount = findViewById(R.id.inputBcHeadCount);
-        Sale = findViewById(R.id.inputBcSale);
-
-        Button Calculator = findViewById(R.id.buttonBcCalculator);
-        Calculator.setOnClickListener(view -> {
-
+    private final View.OnClickListener calculateListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
             // Get Variable String
             String priceText = PricePerUnit.getText().toString();
             String drinkerText = DrinkPricePerUnit.getText().toString();
@@ -89,7 +75,26 @@ public class BuffetCalculatorActivity extends AppCompatActivity {
             } else {
                 RequiredFieldsErrorPopup();
             }
-        });
+        }
+    };
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.buffet_calculator);
+
+        // Input Variable
+        PricePerUnit = findViewById(R.id.inputBcPricePerUnit);
+        DrinkPricePerUnit = findViewById(R.id.inputBcDrinkerPrice);
+        isTax = findViewById(R.id.switchBcTax);
+        SerCharge = findViewById(R.id.inputBcServiceCharge);
+        Tips = findViewById(R.id.inputBcTips);
+        HeadCount = findViewById(R.id.inputBcHeadCount);
+        Sale = findViewById(R.id.inputBcSale);
+        SaleRadio = findViewById(R.id.radioSale);
+
+        Button Calculator = findViewById(R.id.buttonBcCalculator);
+        Calculator.setOnClickListener(calculateListener);
     }
 
     @SuppressLint("SetTextI18n")
@@ -107,9 +112,9 @@ public class BuffetCalculatorActivity extends AppCompatActivity {
         titleTextView.setText("ค่าอาหารมื้อนี้");
         TextView messageTextView = customLayout.findViewById(R.id.messageText);
         messageTextView.setText(
-            "ราคาต่อคน: " + totalPricePerUnit + "\n" +
-            "จำนวนคนในกลุ่ม: " + headcount + "\n" +
-            "ราคารวมทั้งหมด: " + totalPrice
+            "ราคาต่อคน: " + totalPricePerUnit + " บาท\n" +
+            "จำนวนคนในกลุ่ม: " + headcount + " คน\n" +
+            "ราคารวมทั้งหมด: " + totalPrice + "บาท"
         );
 
         builder.setPositiveButton("คำนวนใหม่", (dialog, which) -> dialog.dismiss());

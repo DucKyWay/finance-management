@@ -22,4 +22,5 @@
         <string name="bcHint_serviceCharge">10</string>
         <string name="bcHint_tips">10</string>
         <string name="bcHint_headCount">1</string>
+        <string name="bcHint_sale">0</string>
 </resources>
