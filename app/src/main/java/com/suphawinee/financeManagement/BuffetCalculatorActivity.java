@@ -3,6 +3,7 @@ package com.suphawinee.financeManagement;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -12,70 +13,83 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.text.DecimalFormat;
+
 public class BuffetCalculatorActivity extends AppCompatActivity {
 
-    private EditText PricePerUnit;
-    private EditText DrinkPricePerUnit;
+    // UI
+    private EditText pricePerUnit;
+    private EditText drinkPricePerUnit;
     @SuppressLint("UseSwitchCompatOrMaterialCode")
     private Switch isTax;
-    private EditText SerCharge;
-    private EditText Tips;
-    private EditText HeadCount;
+    private EditText serChargeInput;
+    private EditText tipsInput;
+    private EditText headCountInput;
 
-    private RadioGroup SaleRadio;
-    private EditText Sale;
+    private RadioGroup saleRadio;
+    private EditText saleInput;
 
-    private double TotalPrice = 0.0;
-    private double TotalPricePerUnit = 0.0;
+    // CONSTS
+    private static final double DEFAULT_TAX_RATE = 0.07;
+    private static final DecimalFormat MONEY_2DP = new DecimalFormat("#,##0.00");
 
-    private final View.OnClickListener calculateListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            // Get Variable String
-            String priceText = PricePerUnit.getText().toString();
-            String drinkerText = DrinkPricePerUnit.getText().toString();
-            String serChargeText = SerCharge.getText().toString();
-            String tipsText = Tips.getText().toString();
-            String headCountText = HeadCount.getText().toString();
-            String saleText = Sale.getText().toString();
+    // STATE
+    private double totalPrice = 0.0;
+    private double totalPricePerUnit = 0.0;
 
-            if (priceText.isEmpty() || headCountText.isEmpty()) {
-                RequiredFieldsErrorPopup();
-                return;
-            }
+    private final View.OnClickListener calculateListener = view -> {
+        // read, default
+        Double price = readDouble(pricePerUnit, null);
+        Integer headCount = readInt(headCountInput, null);
 
-            // Convert Variable
-            double price = Double.parseDouble(priceText);
-            double drinker = drinkerText.isEmpty() ? 0.00 : Double.parseDouble(drinkerText); // if empty = 0
-            boolean isTaxChecked = isTax.isChecked();
-            int serviceCharge = serChargeText.isEmpty() ? 0 : Integer.parseInt(serChargeText); // if empty = 0
-            int tips = tipsText.isEmpty() ? 0 : Integer.parseInt(tipsText); // if empty = 0
-            int headCount = Integer.parseInt(headCountText);
-            double sale = saleText.isEmpty() ? 0.00 : Double.parseDouble(saleText); // if empty = 0
-            double Tax = isTaxChecked ? 0.07 : 0.00;
-
-            if (headCount != 0) {
-                TotalPricePerUnit = (price + drinker) * (1 + Tax + (serviceCharge * 0.01) + (tips * 0.01));
-                TotalPrice = TotalPricePerUnit * headCount;
-
-                SaleRadio = findViewById(R.id.radioSale);
-                int checkedRadioButtonId = SaleRadio.getCheckedRadioButtonId();
-                if (checkedRadioButtonId == R.id.radioSalePrice) {
-                    TotalPrice -= sale;
-                    TotalPricePerUnit = TotalPrice / headCount;
-                } else if (checkedRadioButtonId == R.id.radioSalePercent) {
-                    double salePercent = sale * 0.01;
-                    TotalPricePerUnit = TotalPrice / headCount;
-                    TotalPrice *= 1 - salePercent;
-                } else {
-                    RequiredFieldsErrorPopup();
-                }
-
-                showPricePopup(headCount, TotalPricePerUnit, TotalPrice);
-            } else {
-                RequiredFieldsErrorPopup();
-            }
+        if (price == null || headCount == null || headCount <= 0) {
+            showWarning("คำเตือน", "กรุณากรอกข้อมูล ค่าอาหาร และ จำนวนคน > 0");
+            return;
         }
+
+        double drinker = readDouble(drinkPricePerUnit, 0.0);
+        int serviceChargePercent = readInt(serChargeInput, 0);
+        int tipsPercent = readInt(tipsInput, 0);
+        double saleValue = readDouble(saleInput, 0.0);
+
+        boolean isTaxChecked = isTax.isChecked();
+        double taxRate = isTaxChecked ? DEFAULT_TAX_RATE : 0.0;
+
+        // base cal
+        double basePerHead = (price + drinker);
+        double rateSum = 1
+                + taxRate
+                + (serviceChargePercent / 100.0)
+                + (tipsPercent / 100.0);
+
+        double subtotalPerHead = basePerHead * rateSum;
+        double subtotal = subtotalPerHead * headCount;
+
+        // coupon discount
+        int checkedId = saleRadio.getCheckedRadioButtonId();
+        double discountedTotal = subtotal;
+
+        if (checkedId == R.id.radioSalePrice) {
+            // total on amount
+            discountedTotal = Math.max(0.0, subtotal - saleValue);
+        } else if (checkedId == R.id.radioSalePercent) {
+            // total on percent
+            double salePercent = Math.max(0.0, saleValue) / 100.0;
+            salePercent = Math.min(salePercent, 1.0);
+            discountedTotal = subtotal * (1 - salePercent);
+        } else {
+            // not discount
+        }
+
+        // update
+        totalPrice = discountedTotal;
+        totalPricePerUnit = headCount > 0 ? (discountedTotal / headCount) : 0.0;
+
+        showPricePopup(
+                headCount,
+                totalPricePerUnit,
+                totalPrice
+        );
     };
 
     @Override
@@ -83,61 +97,82 @@ public class BuffetCalculatorActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.buffet_calculator);
 
-        // Input Variable
-        PricePerUnit = findViewById(R.id.inputBcPricePerUnit);
-        DrinkPricePerUnit = findViewById(R.id.inputBcDrinkerPrice);
+        // Bind UI
+        pricePerUnit = findViewById(R.id.inputBcPricePerUnit);
+        drinkPricePerUnit = findViewById(R.id.inputBcDrinkerPrice);
         isTax = findViewById(R.id.switchBcTax);
-        SerCharge = findViewById(R.id.inputBcServiceCharge);
-        Tips = findViewById(R.id.inputBcTips);
-        HeadCount = findViewById(R.id.inputBcHeadCount);
-        Sale = findViewById(R.id.inputBcSale);
-        SaleRadio = findViewById(R.id.radioSale);
+        serChargeInput = findViewById(R.id.inputBcServiceCharge);
+        tipsInput = findViewById(R.id.inputBcTips);
+        headCountInput = findViewById(R.id.inputBcHeadCount);
+        saleInput = findViewById(R.id.inputBcSale);
+        saleRadio = findViewById(R.id.radioSale);
 
-        Button Calculator = findViewById(R.id.buttonBcCalculator);
-        Calculator.setOnClickListener(calculateListener);
+        Button calculator = findViewById(R.id.buttonBcCalculator);
+        calculator.setOnClickListener(calculateListener);
+    }
+
+    // Helper
+
+    private Double readDouble(EditText et, Double fallbackIfEmpty) {
+        String s = et == null ? null : et.getText().toString().trim();
+        if (TextUtils.isEmpty(s)) {
+            return fallbackIfEmpty;
+        }
+        try {
+            return Double.parseDouble(s);
+        } catch (NumberFormatException e) {
+            return fallbackIfEmpty;
+        }
+    }
+
+    private Integer readInt(EditText et, Integer fallbackIfEmpty) {
+        String s = et == null ? null : et.getText().toString().trim();
+        if (TextUtils.isEmpty(s)) {
+            return fallbackIfEmpty;
+        }
+        try {
+            return Integer.parseInt(s);
+        } catch (NumberFormatException e) {
+            return fallbackIfEmpty;
+        }
     }
 
     @SuppressLint("SetTextI18n")
+    private void showPricePopup(int headcount, double perHead, double total) {
+        if (isFinishing()) return;
 
-    private void showPricePopup(int headcount, double totalPricePerUnit, double totalPrice) {
-
-        if(isFinishing()) return;
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        @SuppressLint("InflateParams") View customLayout = getLayoutInflater().inflate(R.layout.custom_popup_layout, null);
-//        builder.setCustomTitle(customLayout);
-        builder.setView(customLayout);
-
+        View customLayout = getLayoutInflater().inflate(R.layout.custom_popup_layout, null);
         TextView titleTextView = customLayout.findViewById(R.id.titleText);
-        titleTextView.setText("ค่าอาหารมื้อนี้");
         TextView messageTextView = customLayout.findViewById(R.id.messageText);
+
+        titleTextView.setText("ค่าอาหารมื้อนี้");
         messageTextView.setText(
-            "ราคาต่อคน: " + totalPricePerUnit + " บาท\n" +
-            "จำนวนคนในกลุ่ม: " + headcount + " คน\n" +
-            "ราคารวมทั้งหมด: " + totalPrice + "บาท"
+                "ราคาต่อคน: " + MONEY_2DP.format(perHead) + " บาท\n" +
+                        "จำนวนคนในกลุ่ม: " + headcount + " คน\n" +
+                        "ราคารวมทั้งหมด: " + MONEY_2DP.format(total) + " บาท"
         );
 
-        builder.setPositiveButton("คำนวนใหม่", (dialog, which) -> dialog.dismiss());
-        AlertDialog dialog = builder.create();
-        builder.show();
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(customLayout)
+                .setPositiveButton("คำนวณใหม่", (d, which) -> d.dismiss())
+                .create();
+        dialog.show();
     }
 
-    private void RequiredFieldsErrorPopup() {
+    private void showWarning(String title, String message) {
+        if (isFinishing()) return;
 
-        if(isFinishing()) return;
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        @SuppressLint("InflateParams") View customLayout = getLayoutInflater().inflate(R.layout.custom_popup_layout, null);
-//        builder.setCustomTitle(customLayout);
-        builder.setView(customLayout);
-
+        View customLayout = getLayoutInflater().inflate(R.layout.custom_popup_layout, null);
         TextView titleTextView = customLayout.findViewById(R.id.titleText);
-        titleTextView.setText("คำเตือน");
         TextView messageTextView = customLayout.findViewById(R.id.messageText);
-        messageTextView.setText("กรุณากรอกข้อมูล ค่าอาหาร และ จำนวนคน > 0");
 
-        builder.setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
-        AlertDialog dialog = builder.create();
-        builder.show();
+        titleTextView.setText(title);
+        messageTextView.setText(message);
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(customLayout)
+                .setPositiveButton("OK", (d, w) -> d.dismiss())
+                .create();
+        dialog.show();
     }
 }
