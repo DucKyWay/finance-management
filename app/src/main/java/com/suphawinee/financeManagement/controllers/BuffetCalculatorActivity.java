@@ -1,4 +1,4 @@
-package com.suphawinee.financeManagement;
+package com.suphawinee.financeManagement.controllers;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -12,6 +12,8 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.suphawinee.financeManagement.R;
 
 import java.text.DecimalFormat;
 
@@ -33,17 +35,13 @@ public class BuffetCalculatorActivity extends AppCompatActivity {
     private static final double DEFAULT_TAX_RATE = 0.07;
     private static final DecimalFormat MONEY_2DP = new DecimalFormat("#,##0.00");
 
-    // STATE
-    private double totalPrice = 0.0;
-    private double totalPricePerUnit = 0.0;
-
     private final View.OnClickListener calculateListener = view -> {
         // read, default
         Double price = readDouble(pricePerUnit, null);
         Integer headCount = readInt(headCountInput, null);
 
         if (price == null || headCount == null || headCount <= 0) {
-            showWarning("คำเตือน", "กรุณากรอกข้อมูล ค่าอาหาร และ จำนวนคน > 0");
+            showWarning("กรุณากรอกข้อมูล ค่าอาหาร และ จำนวนคน > 0");
             return;
         }
 
@@ -82,8 +80,8 @@ public class BuffetCalculatorActivity extends AppCompatActivity {
         }
 
         // update
-        totalPrice = discountedTotal;
-        totalPricePerUnit = headCount > 0 ? (discountedTotal / headCount) : 0.0;
+        double totalPrice = discountedTotal;
+        double totalPricePerUnit = discountedTotal / headCount;
 
         showPricePopup(
                 headCount,
@@ -147,9 +145,9 @@ public class BuffetCalculatorActivity extends AppCompatActivity {
 
         titleTextView.setText("ค่าอาหารมื้อนี้");
         messageTextView.setText(
-                "ราคาต่อคน: " + MONEY_2DP.format(perHead) + " บาท\n" +
-                        "จำนวนคนในกลุ่ม: " + headcount + " คน\n" +
-                        "ราคารวมทั้งหมด: " + MONEY_2DP.format(total) + " บาท"
+            "ราคาต่อคน: " + MONEY_2DP.format(perHead) + " บาท\n" +
+            "จำนวนคนในกลุ่ม: " + headcount + " คน\n" +
+            "ราคารวมทั้งหมด: " + MONEY_2DP.format(total) + " บาท"
         );
 
         AlertDialog dialog = new AlertDialog.Builder(this)
@@ -159,14 +157,14 @@ public class BuffetCalculatorActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void showWarning(String title, String message) {
+    private void showWarning(String message) {
         if (isFinishing()) return;
 
         View customLayout = getLayoutInflater().inflate(R.layout.custom_popup_layout, null);
         TextView titleTextView = customLayout.findViewById(R.id.titleText);
         TextView messageTextView = customLayout.findViewById(R.id.messageText);
 
-        titleTextView.setText(title);
+        titleTextView.setText("คำเตือน");
         messageTextView.setText(message);
 
         AlertDialog dialog = new AlertDialog.Builder(this)

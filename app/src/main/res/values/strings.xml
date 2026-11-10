@@ -4,7 +4,9 @@
     <string name="app_credit">Develop by DucKyWay.</string>
     <string name="main_description">จัดการมื้ออาหารและการเงินของคุณได้ที่นี่</string>
     <string name="main_shareFood">เริ่มหารค่ามื้ออาหาร</string>
-    <string name="main_buffetCal">มาเริ่มคำนวณค่าอาหารกัน</string>
+    <string name="main_buffetCal">คำนวณค่าอาหารบุฟเฟ่ต์</string>
+    <string name="main_katsuCal">คำนวณค่าคัตสึมิโดริ</string>
+
 <!--    Buffet Calculator Page -->
     <string name="bc_title">มาคำนวนค่าบุฟเฟ่ต์กันเถอะ !</string>
     <string name="bc_pricePerUnit">ค่าอาหารต่อคน</string>
@@ -16,11 +18,20 @@
     <string name="bc_salePrice">ส่วนลด (ราคา)</string>
     <string name="bc_salePercent">ส่วนลด (%)</string>
     <string name="bc_calculator">เริ่มคำนวนกันเลย !</string>
+
+    <!--    Katsu Midori Calculator Page -->
+    <string name="kmc_title">มาคำนวนค่าคัตสึมิโดริกันกันเถอะ !</string>
+        <!--    Katsu Midori Calculator Components -->
+        <string name="kmc_plus">+</string>
+        <string name="kmc_minus">-</string>
+        <string name="kmc_zero">0</string>
+        <string name="kmc_image">Plate Image</string>
+
 <!--    Hint input Text Box -->
-        <string name="bcHint_drinkerPrice">39</string>
-        <string name="bcHint_pricePerUnit">250</string>
-        <string name="bcHint_serviceCharge">10</string>
-        <string name="bcHint_tips">10</string>
-        <string name="bcHint_headCount">1</string>
-        <string name="bcHint_sale">0</string>
+    <string name="bcHint_drinkerPrice">39</string>
+    <string name="bcHint_pricePerUnit">250</string>
+    <string name="bcHint_serviceCharge">10</string>
+    <string name="bcHint_tips">10</string>
+    <string name="bcHint_headCount">1</string>
+    <string name="bcHint_sale">0</string>
 </resources>
