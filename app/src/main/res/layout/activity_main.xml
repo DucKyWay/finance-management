@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".controllers.MainActivity">
 
     <TextView
         android:id="@+id/textHeading"
@@ -48,6 +48,14 @@
             android:layout_gravity="center"
             android:layout_marginTop="8sp"
             android:text="@string/main_buffetCal" />
+
+        <Button
+            android:id="@+id/buttonKatsuMidoriCalculator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="8sp"
+            android:text="@string/main_katsuCal" />
 
     </LinearLayout>
 
